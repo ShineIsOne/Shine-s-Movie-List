@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Movie List | Shine</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Lora:wght@700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d1117;
+    --bg2: #161b22;
+    --bg3: #21262d;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.16);
+    --text: #e6edf3;
+    --text2: #8b949e;
+    --text3: #6e7681;
+    --accent: #e3c343;
+    --accent2: #f0d060;
+    --accent-dim: rgba(227,195,67,0.13);
+    --red: #f85149;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  html { scrollbar-width: none; }
+  html::-webkit-scrollbar { display: none; }
+  .detail-panel { scrollbar-width: none; }
+  .detail-panel::-webkit-scrollbar { display: none; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .sticky-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header {
+    padding: 0 2rem;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  .header-top {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 0 0.75rem;
+  }
+  .logo {
+    font-family: 'Sora', sans-serif; font-weight: 600; letter-spacing: -0.3px; font-size: 20px; color: var(--text);
+  }
+  .logo span { color: var(--accent); }
+  .logo .shine { color: #79c0ff; }
+
+  .tabs-wrap { border-top: 1px solid var(--border); }
+  .tabs {
+    display: flex;
+    padding: 0 2rem;
+    max-width: 1280px;
+    margin: 0 auto;
+    overflow-x: auto;
+  }
+  .tab {
+    padding: 0.65rem 1.25rem; font-size: 12px; font-weight: 700;
+    color: var(--text2); cursor: pointer; border-bottom: 2px solid transparent;
+    transition: all 0.18s; letter-spacing: 0.5px; text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .toolbar-wrap {
+    border-top: 1px solid var(--border);
+    padding: 0.65rem 2rem;
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .search-wrap { position: relative; flex: 1; min-width: 180px; }
+  .search-icon {
+    position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+    color: var(--text3); font-size: 13px; pointer-events: none;
+  }
+  .search-input {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 7px 12px 7px 32px;
+    color: var(--text); font-family: 'Sora', sans-serif; font-size: 13px;
+    outline: none; transition: border-color 0.18s;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--text3); }
+  .view-toggle {
+    display: flex; background: var(--bg3); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); overflow: hidden;
+  }
+  .view-btn {
+    border: none; background: none; color: var(--text2);
+    padding: 6px 13px; cursor: pointer; font-size: 15px; transition: all 0.15s;
+  }
+  .view-btn.active { background: var(--accent); color: #111; }
+
+  .sort-select {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 6px 10px;
+    color: var(--text2); font-family: 'Sora', sans-serif;
+    font-size: 12px; font-weight: 700; cursor: pointer;
+    outline: none; transition: border-color 0.18s;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238b949e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 26px;
+  }
+  .sort-select:focus { border-color: var(--accent); }
+  .sort-select option { background: var(--bg2); color: var(--text); }
+
+  .main {
+    padding: 1.75rem 2rem;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  .list-meta-bar {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;
+  }
+  .list-count { font-size: 13px; color: var(--text2); font-weight: 600; }
+
+  .empty-state { text-align: center; padding: 5rem 1rem; color: var(--text3); }
+  .empty-state .emo { font-size: 48px; margin-bottom: 1rem; }
+  .empty-state p { font-size: 15px; color: var(--text2); }
+  .empty-state span { font-size: 13px; display: block; margin-top: 0.4rem; }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+    gap: 16px;
+  }
+  .movie-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden; cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+    position: relative; user-select: none;
+  }
+  .movie-card:hover { transform: translateY(-4px); border-color: var(--border2); }
+  .card-poster {
+    width: 100%; aspect-ratio: 2/3;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 54px; position: relative; overflow: hidden;
+  }
+  .card-poster img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  .card-poster .card-emoji-fallback {
+    font-size: 54px;
+  }
+  .card-score {
+    position: absolute; bottom: 8px; right: 8px;
+    background: rgba(13,17,23,0.88); border: 1px solid var(--border2);
+    border-radius: 6px; padding: 3px 8px;
+    font-size: 11px; font-weight: 800; color: var(--accent2);
+    backdrop-filter: blur(4px); display: flex; align-items: center; gap: 3px;
+  }
+  .card-meta-tag {
+    position: absolute; bottom: 8px; left: 8px;
+    background: rgba(13,17,23,0.8); border: 1px solid var(--border2);
+    border-radius: 6px; padding: 3px 7px;
+    font-size: 10px; font-weight: 700; color: var(--text2);
+    backdrop-filter: blur(4px);
+  }
+  .card-info { padding: 10px 12px 13px; }
+  .card-title {
+    font-size: 12px; font-weight: 700; color: var(--text); line-height: 1.4;
+    margin-bottom: 4px; display: -webkit-box;
+    -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    transition: color 0.15s; cursor: pointer;
+  }
+  .card-title:hover { color: var(--accent); }
+  .card-genre { font-size: 10px; color: var(--text3); font-weight: 600; letter-spacing: 0.2px; margin-bottom: 3px; white-space: normal; line-height: 1.5; }
+  .card-sub { font-size: 10px; color: var(--text3); }
+
+  .list-view-wrap { display: flex; flex-direction: column; gap: 8px; }
+  .list-item {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 13px 16px;
+    display: flex; align-items: center; gap: 16px; cursor: pointer;
+    transition: border-color 0.18s, background 0.15s; user-select: none;
+  }
+  .list-item:hover { border-color: var(--border2); background: var(--bg3); }
+  .list-thumb {
+    width: 46px; height: 64px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; border: 1px solid var(--border); overflow: hidden;
+  }
+  .list-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .list-body { flex: 1; min-width: 0; }
+  .list-title {
+    font-size: 14px; font-weight: 700; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-bottom: 4px; transition: color 0.15s; cursor: pointer;
+    display: inline-block; max-width: 100%;
+  }
+  .list-title:hover { color: var(--accent); }
+  .list-genre {
+    font-size: 10px; color: var(--text3); font-weight: 600;
+    letter-spacing: 0.2px; margin-bottom: 6px; white-space: normal; line-height: 1.5;
+  }
+  .list-meta-row { display: flex; gap: 0; align-items: center; flex-wrap: wrap; }
+  .list-meta-tag {
+    font-size: 11px; color: var(--text2); font-weight: 600;
+    display: flex; align-items: center; gap: 5px;
+    padding: 2px 8px 2px 0;
+  }
+  .list-meta-tag + .list-meta-tag {
+    padding-left: 8px;
+    border-left: 1px solid var(--border2);
+  }
+  .ico {
+    display: inline-block; width: 11px; height: 11px;
+    vertical-align: middle; opacity: 0.55; flex-shrink: 0;
+  }
+  .list-score-wrap {
+    display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+    font-size: 17px; font-weight: 800; color: var(--accent2);
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 28px; left: 50%;
+    transform: translateX(-50%) translateY(70px);
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: 10px; padding: 10px 20px;
+    font-size: 13px; font-weight: 600; color: var(--text);
+    z-index: 999; transition: transform 0.32s cubic-bezier(.34,1.56,.64,1), opacity 0.3s;
+    opacity: 0; white-space: nowrap; pointer-events: none;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast-icon { color: var(--accent); }
+
+  /* DETAIL PANEL */
+  .detail-overlay {
+    position: fixed; inset: 0; z-index: 400;
+    background: rgba(0,0,0,0); backdrop-filter: blur(0px);
+    display: flex; align-items: flex-end; justify-content: center;
+    pointer-events: none;
+    transition: background 0.28s ease, backdrop-filter 0.28s ease;
+  }
+  .detail-overlay.open {
+    background: rgba(0,0,0,0.62);
+    backdrop-filter: blur(4px);
+    pointer-events: all;
+  }
+  .detail-panel {
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: 18px 18px 0 0; width: 100%; max-width: 700px;
+    max-height: 88vh; overflow-y: auto;
+    padding-bottom: 2.5rem;
+    transform: translateY(100%);
+    transition: transform 0.32s cubic-bezier(.4,0,.2,1);
+  }
+  .detail-overlay.open .detail-panel { transform: translateY(0); }
+  .detail-handle {
+    width: 40px; height: 4px; border-radius: 2px;
+    background: var(--border2); margin: 14px auto 0;
+  }
+  .detail-header {
+    padding: 1.25rem 1.75rem 0;
+    display: flex; align-items: flex-start; gap: 16px;
+  }
+  .detail-poster {
+    width: 76px; height: 110px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 38px; border: 1px solid var(--border2); overflow: hidden;
+  }
+  .detail-poster img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+  .detail-titles { flex: 1; min-width: 0; }
+  .detail-title-main { font-size: 16px; font-weight: 800; color: var(--text); line-height: 1.3; margin-bottom: 4px; }
+  .detail-title-sub { font-size: 13px; color: var(--text2); margin-bottom: 10px; line-height: 1.4; }
+  .detail-score-row { display: flex; align-items: center; gap: 6px; font-size: 22px; font-weight: 800; }
+  .detail-close {
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text2); border-radius: 8px; width: 34px; height: 34px;
+    cursor: pointer; font-size: 15px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s; align-self: flex-start;
+  }
+  .detail-close:hover { background: var(--border2); color: var(--text); }
+  .detail-chips { display: flex; gap: 8px; flex-wrap: wrap; padding: 1rem 1.75rem 0; }
+  .chip {
+    padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;
+    background: var(--bg3); border: 1px solid var(--border); color: var(--text2);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .chip.accent { background: var(--accent-dim); border-color: rgba(227,195,67,0.3); color: var(--accent2); }
+  .detail-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+    margin: 1rem 1.75rem 0; background: var(--border);
+    border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
+  }
+  .detail-cell { background: var(--bg2); padding: 11px 16px; }
+  .detail-cell-label { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; }
+  .detail-cell-val { font-size: 13px; font-weight: 600; color: var(--text); }
+  .detail-cell-val a { color: var(--accent); text-decoration: none; }
+  .detail-cell-val a:hover { text-decoration: underline; }
+  .detail-synopsis { padding: 1.1rem 1.75rem 0; }
+  .detail-synopsis-label { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; }
+  .detail-synopsis-text { font-size: 13px; color: var(--text2); line-height: 1.75; }
+  .detail-synopsis-text.clamped { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+  .detail-read-more {
+    background: none; border: none; color: var(--accent); font-family: 'Sora',sans-serif;
+    font-size: 12px; font-weight: 700; cursor: pointer; padding: 6px 0 0; display: block;
+  }
+
+  /* POSTER FALLBACK COLORS */
+  .pc-1 { background: linear-gradient(145deg, #1c2b1c, #2e5c2e); }
+  .pc-2 { background: linear-gradient(145deg, #1c1c2b, #2e2e5c); }
+  .pc-3 { background: linear-gradient(145deg, #2b1c1c, #5c2e2e); }
+  .pc-4 { background: linear-gradient(145deg, #2b2419, #5c4a2e); }
+  .pc-5 { background: linear-gradient(145deg, #1c2b2b, #1e5050); }
+  .pc-6 { background: linear-gradient(145deg, #2b1c2b, #50285a); }
+  .pc-7 { background: linear-gradient(145deg, #23201a, #4a3e28); }
+  .pc-8 { background: linear-gradient(145deg, #1a2123, #2a4048); }
+
+  @media (max-width: 600px) {
+    .main { padding: 1rem; }
+    .header { padding: 0 1rem; }
+    .tabs { padding: 0 1rem; }
+    .toolbar-wrap { padding: 0.6rem 1rem; }
+    .card-grid { grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 10px; }
+    .detail-grid { grid-template-columns: 1fr; }
+    .detail-header { padding: 1rem 1.25rem 0; }
+    .detail-synopsis { padding: 1rem 1.25rem 0; }
+    .detail-chips { padding: 0.75rem 1.25rem 0; }
+    .detail-grid { margin: 0.75rem 1.25rem 0; }
+  }
+
+  /* LOADING SCREEN */
+  #loadingScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    transition: opacity 0.55s cubic-bezier(.4,0,.2,1), visibility 0.55s;
+  }
+  #loadingScreen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .ls-logo {
+    font-family: 'Sora', sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.3px;
+    margin-bottom: 10px;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: lsFadeUp 0.5s 0.1s ease forwards;
+  }
+  .ls-logo span { color: var(--accent); }
+  .ls-logo .shine { color: #79c0ff; }
+
+  .ls-tagline {
+    font-size: 12px;
+    color: var(--text3);
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 44px;
+    opacity: 0;
+    transform: translateY(8px);
+    animation: lsFadeUp 0.5s 0.22s ease forwards;
+  }
+
+  .ls-poster-row {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 44px;
+    opacity: 0;
+    animation: lsFadeUp 0.55s 0.35s ease forwards;
+  }
+
+  .ls-poster {
+    width: 64px;
+    height: 90px;
+    border-radius: 10px;
+    border: 1px solid var(--border2);
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+    background: var(--bg2);
+  }
+
+  @media (max-width: 600px) {
+    .ls-poster { width: 54px; height: 76px; border-radius: 8px; }
+    .ls-poster-row { gap: 10px; }
+  }
+
+  .ls-poster img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .ls-poster img.loaded { opacity: 1; }
+  .ls-poster-shimmer {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      var(--bg2) 35%,
+      var(--bg3) 50%,
+      var(--bg2) 65%
+    );
+    background-size: 200% 100%;
+    animation: lsShimmer 1.4s infinite linear;
+    border-radius: inherit;
+    transition: opacity 0.3s;
+  }
+  .ls-poster-shimmer.done { opacity: 0; pointer-events: none; }
+
+  @keyframes lsShimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .ls-bar-wrap {
+    width: 220px;
+    height: 3px;
+    background: var(--bg3);
+    border-radius: 99px;
+    overflow: hidden;
+    opacity: 0;
+    animation: lsFadeUp 0.4s 0.5s ease forwards;
+  }
+  @media (max-width: 600px) {
+    .ls-bar-wrap { width: 170px; }
+  }
+  .ls-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+    transition: width 0.22s ease;
+    box-shadow: 0 0 8px rgba(227,195,67,0.45);
+  }
+
+  .ls-status {
+    margin-top: 16px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text3);
+    letter-spacing: 0.4px;
+    opacity: 0;
+    animation: lsFadeUp 0.4s 0.55s ease forwards;
+    min-height: 16px;
+  }
+  .ls-dots { display: inline-block; }
+
+  @keyframes lsFadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div id="loadingScreen">
+  <div class="ls-logo">Movie <span>List |</span> <span class="shine">Shine</span></div>
+  <div class="ls-tagline">Memuat koleksi film</div>
+  <div class="ls-poster-row" id="lsPosterRow"></div>
+  <div class="ls-bar-wrap">
+    <div class="ls-bar" id="lsBar"></div>
+  </div>
+  <div class="ls-status" id="lsStatus">Memuat<span class="ls-dots" id="lsDots"></span></div>
+</div>
+
+<div class="sticky-nav">
+  <div class="header">
+    <div class="header-top">
+      <div class="logo">Movie <span>List |</span> <span class="shine">Shine</span></div>
+    </div>
+  </div>
+  <div class="tabs-wrap">
+    <div class="tabs" id="tabsContainer">
+      <div class="tab active" onclick="switchTab('all', this)">All Movies</div>
+    </div>
+  </div>
+  <div class="toolbar-wrap">
+    <div class="search-wrap">
+      <span class="search-icon">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14"><circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </span>
+      <input class="search-input" type="text" id="searchInput" placeholder="Cari film..." oninput="renderList()">
+    </div>
+    <div class="view-toggle">
+      <button class="view-btn active" id="btnCard" onclick="switchView('card')" title="Card view">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor"><rect x="1" y="1" width="5.5" height="5.5" rx="1"/><rect x="8.5" y="1" width="5.5" height="5.5" rx="1"/><rect x="1" y="8.5" width="5.5" height="5.5" rx="1"/><rect x="8.5" y="8.5" width="5.5" height="5.5" rx="1"/></svg>
+      </button>
+      <button class="view-btn" id="btnList" onclick="switchView('list')" title="List view">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor"><rect x="1" y="2" width="13" height="1.5" rx="0.75"/><rect x="1" y="6.75" width="13" height="1.5" rx="0.75"/><rect x="1" y="11.5" width="13" height="1.5" rx="0.75"/></svg>
+      </button>
+    </div>
+    <select class="sort-select" id="sortSelect" onchange="renderList()" title="Urutkan">
+      <option value="newest">Baru Ditambahkan</option>
+      <option value="rating-desc">&#9733; Rating Tertinggi</option>
+      <option value="rating-asc">&#9733; Rating Terendah</option>
+      <option value="name-asc">A &rarr; Z</option>
+      <option value="name-desc">Z &rarr; A</option>
+    </select>
+  </div>
+</div>
+
+<div class="main">
+  <div class="list-meta-bar">
+    <span class="list-count" id="countLabel">0 Film</span>
+  </div>
+  <div id="movieContainer"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#e3c343" stroke-width="1.5"/><path d="M4.5 7L6.5 9L9.5 5.5" stroke="#e3c343" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </span>
+  <span id="toastMsg"></span>
+</div>
+
+<!-- DETAIL PANEL -->
+<div class="detail-overlay" id="detailOverlay">
+  <div class="detail-panel" id="detailPanel">
+    <div class="detail-handle"></div>
+    <div class="detail-header">
+      <div class="detail-poster" id="dPoster"></div>
+      <div class="detail-titles">
+        <div class="detail-title-main" id="dTitleMain"></div>
+        <div class="detail-title-sub" id="dTitleSub"></div>
+        <div class="detail-score-row">
+          <span style="color:#f0d060;font-size:15px;">&#9733;</span>
+          <span id="dScore"></span>
+          <span style="font-size:12px;color:var(--text3);font-weight:600;">/10</span>
+        </div>
+      </div>
+      <button class="detail-close" onclick="closeDetail()">&#10005;</button>
+    </div>
+    <div class="detail-chips" id="dChips"></div>
+    <div class="detail-grid" id="dGrid"></div>
+    <div class="detail-synopsis">
+      <div class="detail-synopsis-label">Sinopsis</div>
+      <div class="detail-synopsis-text clamped" id="dSynopsis"></div>
+      <button class="detail-read-more" id="dReadMore" onclick="toggleSynopsis()">Baca selengkapnya ▼</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA — diisi otomatis oleh movie_manager.pyw
+// ============================================================
+const MOVIE_DATA = [
+  {
+    "tmdb_id": 1012201,
+    "title": "劇場版ハイキュー!! ゴミ捨て場の決戦",
+    "titleEn": "",
+    "originalTitle": "劇場版ハイキュー!! ゴミ捨て場の決戦",
+    "genre": [
+      "Animasi",
+      "Komedi"
+    ],
+    "director": "満仲勧",
+    "year": 2024,
+    "runtime": "1j 24m",
+    "score": 8.0,
+    "synopsis": "Shoyo Hinata joins Karasuno High's volleyball club to be like his idol, a former Karasuno player known as the 'Little Giant'. But Hinata soon learns that he must team up with his middle school nemesis, Tobio Kageyama. Their clashing styles form a surprising weapon, but can their newfound teamwork defeat their rival Nekoma High in the highly anticipated 'Dumpster Battle', the long awaited ultimate showdown between two opposing underdog teams?",
+    "cover": "https://image.tmdb.org/t/p/w500/chRu7CzagKO9AtGcltDSvCiKOfw.jpg",
+    "tmdb": "https://www.themoviedb.org/movie/1012201",
+    "id": "id_1794915060567",
+    "emoji": "🎬",
+    "addedAt": 1794915060567
+  },
+  {
+    "tmdb_id": 1381071,
+    "title": "ゴジラ-0.0",
+    "titleEn": "",
+    "originalTitle": "ゴジラ-0.0",
+    "genre": [
+      "Cerita Fiksi",
+      "Kengerian",
+      "Aksi"
+    ],
+    "director": "Takashi Yamazaki",
+    "year": 2026,
+    "runtime": "2j 15m",
+    "score": 9.0,
+    "synopsis": "War reduced Japan to zero, and Godzilla plunged it into minus. Two years have passed since then, and the country has faced agonizing struggles to achieve recovery and finally reclaim its daily life. Just as humanity managed to cling to a hard-won peace, a new threat strikes, crushing hope in an instant. There is no third time. Everything ends here.",
+    "cover": "https://image.tmdb.org/t/p/w500/zpcoFlZwyLnBt7bb5wmvGDCdg06.jpg",
+    "tmdb": "https://www.themoviedb.org/movie/1381071",
+    "id": "id_1794914981284",
+    "emoji": "🎬",
+    "addedAt": 1794914981284
+  },
+  {
+    "tmdb_id": 969681,
+    "title": "Spider-Man: Brand New Day",
+    "titleEn": "",
+    "originalTitle": "Spider-Man: Brand New Day",
+    "genre": [
+      "Cerita Fiksi",
+      "Aksi",
+      "Petualangan"
+    ],
+    "director": "Destin Daniel Cretton",
+    "year": 2026,
+    "runtime": "2j 25m",
+    "score": 9.0,
+    "synopsis": "Empat tahun setelah peristiwa Spider-Man: No Way Home, Peter Parker sudah tidak ada lagi dan Spider-Man kini berada di puncak kemampuannya dalam menjaga Kota New York tetap aman. Semuanya berjalan dengan baik hingga serangkaian kejahatan yang tidak biasa menyeret Spider-Man ke dalam jaring misteri yang lebih besar dari apa pun yang pernah ia hadapi sebelumnya. Untuk menghadapi apa yang akan datang, Spider-Man tidak hanya harus berada dalam kondisi fisik dan mental terbaiknya, tetapi juga harus siap menghadapi konsekuensi dari masa lalunya!",
+    "cover": "https://image.tmdb.org/t/p/w500/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg",
+    "tmdb": "https://www.themoviedb.org/movie/969681",
+    "id": "id_1794914938445",
+    "emoji": "🎬",
+    "addedAt": 1794914938445
+  },
+  {
+    "tmdb_id": 533535,
+    "title": "Deadpool & Wolverine",
+    "titleEn": "",
+    "originalTitle": "Deadpool & Wolverine",
+    "genre": [
+      "Aksi",
+      "Komedi",
+      "Cerita Fiksi"
+    ],
+    "director": "Shawn Levy",
+    "year": 2024,
+    "runtime": "2j 8m",
+    "score": 8.8,
+    "synopsis": "Wade Wilson yang lesu bekerja keras dalam kehidupan sipil dengan hari-harinya sebagai tentara bayaran yang fleksibel secara moral, Deadpool, di belakangnya. Namun ketika dunia asalnya menghadapi ancaman eksistensial, Wade terpaksa harus kembali bekerja sama dengan Wolverine yang bahkan lebih enggan.",
+    "cover": "https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg",
+    "tmdb": "https://www.themoviedb.org/movie/533535",
+    "id": "id_1794914835196",
+    "emoji": "🎬",
+    "addedAt": 1794914835196
+  }
+];
+// ============================================================
+
+const POSTER_COLORS = ['pc-1','pc-2','pc-3','pc-4','pc-5','pc-6','pc-7','pc-8'];
+let movieList = MOVIE_DATA;
+let currentTab = 'all';
+let currentView = 'card';
+let synopsisExpanded = false;
+
+const ICO_TIME = `<svg class="ico" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3.5V6L7.5 7.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`;
+const ICO_YEAR = `<svg class="ico" viewBox="0 0 12 12" fill="none"><rect x="1.5" y="2.5" width="9" height="8" rx="1.2" stroke="currentColor" stroke-width="1.2"/><path d="M4 1.5V3.5M8 1.5V3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M1.5 5.5H10.5" stroke="currentColor" stroke-width="1.2"/></svg>`;
+
+function fmtScore(s) {
+  const n = parseFloat(s);
+  if (isNaN(n)) return '—';
+  return Number.isInteger(n) ? String(n) : n.toFixed(1);
+}
+
+function switchTab(tab, el) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderList();
+}
+
+function switchView(view) {
+  currentView = view;
+  document.getElementById('btnCard').classList.toggle('active', view === 'card');
+  document.getElementById('btnList').classList.toggle('active', view === 'list');
+  renderList();
+}
+
+function getFiltered() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  return movieList.filter(m => {
+    const matchTab = currentTab === 'all' || 
+      (Array.isArray(m.genre) && m.genre.some(g => g.toLowerCase() === currentTab.toLowerCase()));
+    const matchSearch = !q ||
+      (m.title||'').toLowerCase().includes(q) ||
+      (m.titleEn||'').toLowerCase().includes(q) ||
+      (m.originalTitle||'').toLowerCase().includes(q) ||
+      (m.director||'').toLowerCase().includes(q) ||
+      (Array.isArray(m.genre) ? m.genre.join(' ') : (m.genre||'')).toLowerCase().includes(q);
+    return matchTab && matchSearch;
+  });
+}
+
+function getSorted(list) {
+  const sel = document.getElementById('sortSelect');
+  const mode = sel ? sel.value : 'newest';
+  const arr = list.slice();
+  if (mode === 'newest') {
+    arr.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+  } else if (mode === 'rating-desc') {
+    arr.sort((a, b) => (parseFloat(b.score) || 0) - (parseFloat(a.score) || 0));
+  } else if (mode === 'rating-asc') {
+    arr.sort((a, b) => (parseFloat(a.score) || 0) - (parseFloat(b.score) || 0));
+  } else if (mode === 'name-asc') {
+    arr.sort((a, b) => (a.title || a.titleEn || '').localeCompare(b.title || b.titleEn || ''));
+  } else if (mode === 'name-desc') {
+    arr.sort((a, b) => (b.title || b.titleEn || '').localeCompare(a.title || a.titleEn || ''));
+  }
+  return arr;
+}
+
+function renderList() {
+  const list = getSorted(getFiltered());
+  const container = document.getElementById('movieContainer');
+  document.getElementById('countLabel').textContent = list.length + ' Film';
+  if (list.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="emo">🎬</div><p>Belum ada film di sini</p><span>Tambahkan film lewat aplikasi Movie Manager</span></div>`;
+    return;
+  }
+  if (currentView === 'card') {
+    container.innerHTML = '<div class="card-grid">' + list.map(cardHTML).join('') + '</div>';
+  } else {
+    container.innerHTML = '<div class="list-view-wrap">' + list.map(listItemHTML).join('') + '</div>';
+  }
+}
+
+function fmtGenre(g) {
+  if (!g) return '';
+  if (Array.isArray(g)) return g.join(', ');
+  return String(g);
+}
+
+function cardHTML(m) {
+  const displayTitle = m.title || m.titleEn || m.originalTitle || 'Untitled';
+  const posterContent = m.cover
+    ? `<img src="${escHtml(m.cover)}" alt="${escHtml(displayTitle)}" onerror="this.parentElement.innerHTML='<span class=\\'card-emoji-fallback\\'>${m.emoji||'🎬'}</span>'">`
+    : `<span class="card-emoji-fallback">${m.emoji||'🎬'}</span>`;
+  return `<div class="movie-card" onclick="openDetail('${m.id}')">
+    <div class="card-poster ${m.cover ? '' : (m.color||'pc-1')}">
+      ${posterContent}
+      ${m.runtime ? `<span class="card-meta-tag">${m.runtime}</span>` : ''}
+      <span class="card-score"><span style="font-size:9px;color:#f0d060;">&#9733;</span><span style="color:#79c0ff">${fmtScore(m.score)}</span><small style="font-size:9px;color:#8b949e;margin-left:1px;">/10</small></span>
+    </div>
+    <div class="card-info">
+      <div class="card-title" onclick="copyTitle(event,'${escAttr(displayTitle)}')" title="Klik untuk copy judul">${escHtml(displayTitle)}</div>
+      <div class="card-genre">${escHtml(fmtGenre(m.genre))}</div>
+      ${m.year ? `<div class="card-sub">${m.year}</div>` : ''}
+    </div>
+  </div>`;
+}
+
+function listItemHTML(m) {
+  const displayTitle = m.title || m.titleEn || m.originalTitle || 'Untitled';
+  const thumbContent = m.cover
+    ? `<img src="${escHtml(m.cover)}" alt="${escHtml(displayTitle)}" onerror="this.outerHTML='${m.emoji||'🎬'}'">`
+    : (m.emoji||'🎬');
+  const metaTags = [];
+  if (m.runtime) metaTags.push(`<span class="list-meta-tag">${ICO_TIME}${m.runtime}</span>`);
+  if (m.year) metaTags.push(`<span class="list-meta-tag">${ICO_YEAR}${m.year}</span>`);
+  if (m.director) metaTags.push(`<span class="list-meta-tag">${escHtml(m.director)}</span>`);
+  return `<div class="list-item" onclick="openDetail('${m.id}')">
+    <div class="list-thumb ${m.cover ? '' : (m.color||'pc-1')}">${thumbContent}</div>
+    <div class="list-body">
+      <div class="list-title" onclick="copyTitle(event,'${escAttr(displayTitle)}')" title="Klik untuk copy judul">${escHtml(displayTitle)}</div>
+      <div class="list-genre">${escHtml(fmtGenre(m.genre))}</div>
+      ${metaTags.length ? `<div class="list-meta-row">${metaTags.join('')}</div>` : ''}
+    </div>
+    <div class="list-score-wrap">
+      <span style="font-size:12px;color:#f0d060;">&#9733;</span><span style="color:#79c0ff">${fmtScore(m.score)}</span><small style="font-size:11px;color:var(--text3);font-weight:600;">/10</small>
+    </div>
+  </div>`;
+}
+
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escAttr(s) { return String(s||'').replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
+
+function copyTitle(e, title) {
+  e.stopPropagation();
+  navigator.clipboard.writeText(title)
+    .then(() => showToast('Disalin: ' + title))
+    .catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = title; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      showToast('Disalin: ' + title);
+    });
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function openDetail(id) {
+  const m = movieList.find(x => x.id === id);
+  if (!m) return;
+  synopsisExpanded = false;
+
+  const dPoster = document.getElementById('dPoster');
+  const displayTitle = m.title || m.titleEn || m.originalTitle || '—';
+  const subTitle = (m.originalTitle && m.originalTitle !== m.title) ? m.originalTitle : (m.titleEn || '');
+
+  if (m.cover) {
+    dPoster.className = 'detail-poster';
+    dPoster.innerHTML = `<img src="${escHtml(m.cover)}" alt="${escHtml(displayTitle)}" onerror="this.parentElement.className='detail-poster ${m.color||'pc-1'}';this.parentElement.textContent='${m.emoji||'🎬'}'">`;
+  } else {
+    dPoster.className = 'detail-poster ' + (m.color||'pc-1');
+    dPoster.textContent = m.emoji||'🎬';
+  }
+
+  document.getElementById('dTitleMain').textContent = displayTitle;
+  document.getElementById('dTitleSub').textContent = subTitle;
+  const scoreEl = document.getElementById('dScore');
+  scoreEl.textContent = fmtScore(m.score);
+  scoreEl.style.color = '#79c0ff';
+
+  const chips = document.getElementById('dChips');
+  chips.innerHTML = '';
+  if (m.genre) { const _gg = Array.isArray(m.genre) ? m.genre : [m.genre]; _gg.forEach(g => { chips.innerHTML += `<span class="chip accent">${escHtml(g)}</span>`; }); }
+  if (m.year) chips.innerHTML += `<span class="chip">${m.year}</span>`;
+  if (m.runtime) chips.innerHTML += `<span class="chip">${escHtml(m.runtime)}</span>`;
+  if (m.director) chips.innerHTML += `<span class="chip">${escHtml(m.director)}</span>`;
+
+  const grid = document.getElementById('dGrid');
+  const rows = [
+    ['Sutradara', escHtml(m.director || '—')],
+    ['Tahun Rilis', m.year || '—'],
+    ['Durasi', m.runtime || '—'],
+    ['Link TMDB', m.tmdb ? `<a href="${escHtml(m.tmdb)}" target="_blank" rel="noopener">Buka &#8599;</a>` : '—'],
+  ];
+  grid.innerHTML = rows.map(([l, v]) => `<div class="detail-cell"><div class="detail-cell-label">${l}</div><div class="detail-cell-val">${v}</div></div>`).join('');
+
+  const syn = document.getElementById('dSynopsis');
+  const btn = document.getElementById('dReadMore');
+  syn.textContent = m.synopsis || 'Belum ada sinopsis.';
+  syn.classList.add('clamped');
+  btn.style.display = (m.synopsis && m.synopsis.length > 200) ? 'block' : 'none';
+  btn.textContent = 'Baca selengkapnya ▼';
+
+  const overlay = document.getElementById('detailOverlay');
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add('open')));
+}
+
+function closeDetail() {
+  const overlay = document.getElementById('detailOverlay');
+  overlay.classList.remove('open');
+  overlay.addEventListener('transitionend', function handler(e) {
+    if (e.propertyName === 'background') {
+      overlay.style.display = 'none';
+      overlay.removeEventListener('transitionend', handler);
+    }
+  });
+}
+
+function toggleSynopsis() {
+  synopsisExpanded = !synopsisExpanded;
+  document.getElementById('dSynopsis').classList.toggle('clamped', !synopsisExpanded);
+  document.getElementById('dReadMore').textContent = synopsisExpanded ? 'Sembunyikan ▲' : 'Baca selengkapnya ▼';
+}
+
+document.getElementById('detailOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeDetail();
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeDetail();
+});
+
+// LOADING SCREEN INITIALIZER
+(function() {
+  const covers = movieList
+    .filter(m => m.cover)
+    .slice(0, 5)
+    .map(m => m.cover);
+
+  const posterRow = document.getElementById('lsPosterRow');
+  const lsBar = document.getElementById('lsBar');
+  const lsStatus = document.getElementById('lsStatus');
+
+  const dotsEl = document.getElementById('lsDots');
+  let dotCount = 0;
+  const dotTimer = setInterval(() => {
+    dotCount = (dotCount + 1) % 4;
+    dotsEl.textContent = '.'.repeat(dotCount);
+  }, 380);
+
+  function finishLoading() {
+    clearInterval(dotTimer);
+    lsBar.style.width = '100%';
+    lsStatus.textContent = 'Siap!';
+    setTimeout(() => {
+      document.getElementById('loadingScreen').classList.add('hidden');
+    }, 400);
+  }
+
+  if (covers.length === 0) {
+    setTimeout(finishLoading, 400);
+    return;
+  }
+
+  const imgEls = covers.map(src => {
+    const wrap = document.createElement('div');
+    wrap.className = 'ls-poster';
+    const shimmer = document.createElement('div');
+    shimmer.className = 'ls-poster-shimmer';
+    const img = document.createElement('img');
+    wrap.appendChild(shimmer);
+    wrap.appendChild(img);
+    posterRow.appendChild(wrap);
+    return { img, shimmer };
+  });
+
+  let loaded = 0;
+  const total = imgEls.length;
+
+  function onImgLoad(imgEl, shimmer) {
+    imgEl.classList.add('loaded');
+    shimmer.classList.add('done');
+    loaded++;
+    const pct = Math.round((loaded / total) * 100);
+    lsBar.style.width = pct + '%';
+    lsStatus.textContent = 'Memuat poster ' + loaded + ' / ' + total;
+    if (loaded >= total) finishLoading();
+  }
+
+  imgEls.forEach(({ img, shimmer }, i) => {
+    setTimeout(() => {
+      img.onload = () => onImgLoad(img, shimmer);
+      img.onerror = () => onImgLoad(img, shimmer);
+      img.src = covers[i];
+    }, i * 80);
+  });
+
+  setTimeout(finishLoading, 6000);
+})();
+
+renderList();
+</script>
+</body>
+</html>
