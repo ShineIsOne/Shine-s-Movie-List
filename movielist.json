@@ -1,0 +1,85 @@
+[
+  {
+    "tmdb_id": 1012201,
+    "title": "Haikyu!! The Dumpster Battle",
+    "titleEn": "",
+    "originalTitle": "劇場版ハイキュー!! ゴミ捨て場の決戦",
+    "genre": [
+      "Animasi",
+      "Komedi"
+    ],
+    "director": "Susumu Mitsunaka",
+    "year": 2024,
+    "runtime": "1j 24m",
+    "score": 8.0,
+    "synopsis": "Shoyo Hinata joins Karasuno High's volleyball club to be like his idol, a former Karasuno player known as the 'Little Giant'. But Hinata soon learns that he must team up with his middle school nemesis, Tobio Kageyama. Their clashing styles form a surprising weapon, but can their newfound teamwork defeat their rival Nekoma High in the highly anticipated 'Dumpster Battle', the long awaited ultimate showdown between two opposing underdog teams?",
+    "cover": "https://image.tmdb.org/t/p/w500/chRu7CzagKO9AtGcltDSvCiKOfw.jpg",
+    "tmdb": "https://www.themoviedb.org/movie/1012201",
+    "id": "id_1794915060567",
+    "emoji": "🎬",
+    "addedAt": 1794915060567
+  },
+  {
+    "tmdb_id": 1381071,
+    "title": "Godzilla Minus Zero",
+    "titleEn": "",
+    "originalTitle": "ゴジラ-0.0",
+    "genre": [
+      "Cerita Fiksi",
+      "Kengerian",
+      "Aksi"
+    ],
+    "director": "Takashi Yamazaki",
+    "year": 2026,
+    "runtime": "2j 15m",
+    "score": 9.0,
+    "synopsis": "War reduced Japan to zero, and Godzilla plunged it into minus. Two years have passed since then, and the country has faced agonizing struggles to achieve recovery and finally reclaim its daily life. Just as humanity managed to cling to a hard-won peace, a new threat strikes, crushing hope in an instant. There is no third time. Everything ends here.",
+    "cover": "https://image.tmdb.org/t/p/w500/zpcoFlZwyLnBt7bb5wmvGDCdg06.jpg",
+    "tmdb": "https://www.themoviedb.org/movie/1381071",
+    "id": "id_1794914981284",
+    "emoji": "🎬",
+    "addedAt": 1794914981284
+  },
+  {
+    "tmdb_id": 969681,
+    "title": "Spider-Man: Brand New Day",
+    "titleEn": "",
+    "originalTitle": "Spider-Man: Brand New Day",
+    "genre": [
+      "Cerita Fiksi",
+      "Aksi",
+      "Petualangan"
+    ],
+    "director": "Destin Daniel Cretton",
+    "year": 2026,
+    "runtime": "2j 25m",
+    "score": 9.0,
+    "synopsis": "Empat tahun setelah peristiwa Spider-Man: No Way Home, Peter Parker sudah tidak ada lagi dan Spider-Man kini berada di puncak kemampuannya dalam menjaga Kota New York tetap aman. Semuanya berjalan dengan baik hingga serangkaian kejahatan yang tidak biasa menyeret Spider-Man ke dalam jaring misteri yang lebih besar dari apa pun yang pernah ia hadapi sebelumnya. Untuk menghadapi apa yang akan datang, Spider-Man tidak hanya harus berada dalam kondisi fisik dan mental terbaiknya, tetapi juga harus siap menghadapi konsekuensi dari masa lalunya!",
+    "cover": "https://image.tmdb.org/t/p/w500/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg",
+    "tmdb": "https://www.themoviedb.org/movie/969681",
+    "id": "id_1794914938445",
+    "emoji": "🎬",
+    "addedAt": 1794914938445
+  },
+  {
+    "tmdb_id": 533535,
+    "title": "Deadpool & Wolverine",
+    "titleEn": "",
+    "originalTitle": "Deadpool & Wolverine",
+    "genre": [
+      "Aksi",
+      "Komedi",
+      "Cerita Fiksi"
+    ],
+    "director": "Shawn Levy",
+    "year": 2024,
+    "runtime": "2j 8m",
+    "score": 8.8,
+    "synopsis": "Wade Wilson yang lesu bekerja keras dalam kehidupan sipil dengan hari-harinya sebagai tentara bayaran yang fleksibel secara moral, Deadpool, di belakangnya. Namun ketika dunia asalnya menghadapi ancaman eksistensial, Wade terpaksa harus kembali bekerja sama dengan Wolverine yang bahkan lebih enggan.",
+    "cover": "https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg",
+    "tmdb": "https://www.themoviedb.org/movie/533535",
+    "id": "id_1794914835196",
+    "emoji": "🎬",
+    "addedAt": 1794914835196
+  }
+]

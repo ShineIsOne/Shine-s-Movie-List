@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -127,10 +127,48 @@
     max-width: 1280px;
     margin: 0 auto;
   }
-  .list-meta-bar {
-    display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;
+
+  /* YEAR GROUPING */
+  .year-group {
+    margin-bottom: 2.25rem;
   }
-  .list-count { font-size: 13px; color: var(--text2); font-weight: 600; }
+  .year-group:last-child {
+    margin-bottom: 1rem;
+  }
+  .year-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .year-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .year-title::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 18px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+  .year-count {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text2);
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
 
   .empty-state { text-align: center; padding: 5rem 1rem; color: var(--text3); }
   .empty-state .emo { font-size: 48px; margin-bottom: 1rem; }
@@ -480,12 +518,12 @@
 <!-- LOADING SCREEN -->
 <div id="loadingScreen">
   <div class="ls-logo">Movie <span>List |</span> <span class="shine">Shine</span></div>
-  <div class="ls-tagline">Memuat koleksi film</div>
+  <div class="ls-tagline">Loading movie collection</div>
   <div class="ls-poster-row" id="lsPosterRow"></div>
   <div class="ls-bar-wrap">
     <div class="ls-bar" id="lsBar"></div>
   </div>
-  <div class="ls-status" id="lsStatus">Memuat<span class="ls-dots" id="lsDots"></span></div>
+  <div class="ls-status" id="lsStatus">Loading<span class="ls-dots" id="lsDots"></span></div>
 </div>
 
 <div class="sticky-nav">
@@ -504,7 +542,7 @@
       <span class="search-icon">
         <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14"><circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       </span>
-      <input class="search-input" type="text" id="searchInput" placeholder="Cari film..." oninput="renderList()">
+      <input class="search-input" type="text" id="searchInput" placeholder="Search movies..." oninput="renderList()">
     </div>
     <div class="view-toggle">
       <button class="view-btn active" id="btnCard" onclick="switchView('card')" title="Card view">
@@ -514,20 +552,10 @@
         <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor"><rect x="1" y="2" width="13" height="1.5" rx="0.75"/><rect x="1" y="6.75" width="13" height="1.5" rx="0.75"/><rect x="1" y="11.5" width="13" height="1.5" rx="0.75"/></svg>
       </button>
     </div>
-    <select class="sort-select" id="sortSelect" onchange="renderList()" title="Urutkan">
-      <option value="newest">Baru Ditambahkan</option>
-      <option value="rating-desc">&#9733; Rating Tertinggi</option>
-      <option value="rating-asc">&#9733; Rating Terendah</option>
-      <option value="name-asc">A &rarr; Z</option>
-      <option value="name-desc">Z &rarr; A</option>
-    </select>
   </div>
 </div>
 
 <div class="main">
-  <div class="list-meta-bar">
-    <span class="list-count" id="countLabel">0 Film</span>
-  </div>
   <div id="movieContainer"></div>
 </div>
 
@@ -559,9 +587,9 @@
     <div class="detail-chips" id="dChips"></div>
     <div class="detail-grid" id="dGrid"></div>
     <div class="detail-synopsis">
-      <div class="detail-synopsis-label">Sinopsis</div>
+      <div class="detail-synopsis-label">Synopsis</div>
       <div class="detail-synopsis-text clamped" id="dSynopsis"></div>
-      <button class="detail-read-more" id="dReadMore" onclick="toggleSynopsis()">Baca selengkapnya ▼</button>
+      <button class="detail-read-more" id="dReadMore" onclick="toggleSynopsis()">Read more ▼</button>
     </div>
   </div>
 </div>
@@ -573,14 +601,14 @@
 const MOVIE_DATA = [
   {
     "tmdb_id": 1012201,
-    "title": "劇場版ハイキュー!! ゴミ捨て場の決戦",
+    "title": "Haikyu!! The Dumpster Battle",
     "titleEn": "",
     "originalTitle": "劇場版ハイキュー!! ゴミ捨て場の決戦",
     "genre": [
       "Animasi",
       "Komedi"
     ],
-    "director": "満仲勧",
+    "director": "Susumu Mitsunaka",
     "year": 2024,
     "runtime": "1j 24m",
     "score": 8.0,
@@ -593,7 +621,7 @@ const MOVIE_DATA = [
   },
   {
     "tmdb_id": 1381071,
-    "title": "ゴジラ-0.0",
+    "title": "Godzilla Minus Zero",
     "titleEn": "",
     "originalTitle": "ゴジラ-0.0",
     "genre": [
@@ -703,9 +731,13 @@ function getFiltered() {
 
 function getSorted(list) {
   const sel = document.getElementById('sortSelect');
-  const mode = sel ? sel.value : 'newest';
+  const mode = sel ? sel.value : 'year-asc';
   const arr = list.slice();
-  if (mode === 'newest') {
+  if (mode === 'year-asc') {
+    arr.sort((a, b) => (parseInt(a.year) || 9999) - (parseInt(b.year) || 9999) || (b.addedAt || 0) - (a.addedAt || 0));
+  } else if (mode === 'year-desc') {
+    arr.sort((a, b) => (parseInt(b.year) || 0) - (parseInt(a.year) || 0) || (b.addedAt || 0) - (a.addedAt || 0));
+  } else if (mode === 'newest') {
     arr.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
   } else if (mode === 'rating-desc') {
     arr.sort((a, b) => (parseFloat(b.score) || 0) - (parseFloat(a.score) || 0));
@@ -722,16 +754,62 @@ function getSorted(list) {
 function renderList() {
   const list = getSorted(getFiltered());
   const container = document.getElementById('movieContainer');
-  document.getElementById('countLabel').textContent = list.length + ' Film';
+  const countEl = document.getElementById('countLabel');
+  if (countEl) countEl.textContent = list.length + (list.length === 1 ? ' Movie' : ' Movies');
+
   if (list.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="emo">🎬</div><p>Belum ada film di sini</p><span>Tambahkan film lewat aplikasi Movie Manager</span></div>`;
+    container.innerHTML = `<div class="empty-state"><div class="emo">🎬</div><p>No movies here yet</p><span>Add movies using the Movie Manager app</span></div>`;
     return;
   }
-  if (currentView === 'card') {
-    container.innerHTML = '<div class="card-grid">' + list.map(cardHTML).join('') + '</div>';
-  } else {
-    container.innerHTML = '<div class="list-view-wrap">' + list.map(listItemHTML).join('') + '</div>';
+
+  // Group movies by year
+  const groups = {};
+  const yearOrder = [];
+  list.forEach(m => {
+    const yr = m.year ? String(m.year) : 'Other';
+    if (!groups[yr]) {
+      groups[yr] = [];
+      yearOrder.push(yr);
+    }
+    groups[yr].push(m);
+  });
+
+  const sel = document.getElementById('sortSelect');
+  const mode = sel ? sel.value : 'year-asc';
+
+  if (mode === 'year-asc') {
+    yearOrder.sort((a, b) => {
+      if (a === 'Other') return 1;
+      if (b === 'Other') return -1;
+      return parseInt(a) - parseInt(b);
+    });
+  } else if (mode === 'year-desc') {
+    yearOrder.sort((a, b) => {
+      if (a === 'Other') return 1;
+      if (b === 'Other') return -1;
+      return parseInt(b) - parseInt(a);
+    });
   }
+
+  let html = '';
+  yearOrder.forEach(yr => {
+    const movies = groups[yr];
+    const contentHTML = currentView === 'card'
+      ? '<div class="card-grid">' + movies.map(cardHTML).join('') + '</div>'
+      : '<div class="list-view-wrap">' + movies.map(listItemHTML).join('') + '</div>';
+
+    html += `
+      <div class="year-group">
+        <div class="year-header">
+          <div class="year-title">${escHtml(yr)}</div>
+          <span class="year-count">${movies.length} ${movies.length === 1 ? 'Movie' : 'Movies'}</span>
+        </div>
+        ${contentHTML}
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
 }
 
 function fmtGenre(g) {
@@ -752,7 +830,7 @@ function cardHTML(m) {
       <span class="card-score"><span style="font-size:9px;color:#f0d060;">&#9733;</span><span style="color:#79c0ff">${fmtScore(m.score)}</span><small style="font-size:9px;color:#8b949e;margin-left:1px;">/10</small></span>
     </div>
     <div class="card-info">
-      <div class="card-title" onclick="copyTitle(event,'${escAttr(displayTitle)}')" title="Klik untuk copy judul">${escHtml(displayTitle)}</div>
+      <div class="card-title" onclick="copyTitle(event,'${escAttr(displayTitle)}')" title="Click to copy title">${escHtml(displayTitle)}</div>
       <div class="card-genre">${escHtml(fmtGenre(m.genre))}</div>
       ${m.year ? `<div class="card-sub">${m.year}</div>` : ''}
     </div>
@@ -771,7 +849,7 @@ function listItemHTML(m) {
   return `<div class="list-item" onclick="openDetail('${m.id}')">
     <div class="list-thumb ${m.cover ? '' : (m.color||'pc-1')}">${thumbContent}</div>
     <div class="list-body">
-      <div class="list-title" onclick="copyTitle(event,'${escAttr(displayTitle)}')" title="Klik untuk copy judul">${escHtml(displayTitle)}</div>
+      <div class="list-title" onclick="copyTitle(event,'${escAttr(displayTitle)}')" title="Click to copy title">${escHtml(displayTitle)}</div>
       <div class="list-genre">${escHtml(fmtGenre(m.genre))}</div>
       ${metaTags.length ? `<div class="list-meta-row">${metaTags.join('')}</div>` : ''}
     </div>
@@ -787,12 +865,12 @@ function escAttr(s) { return String(s||'').replace(/'/g,'&#39;').replace(/"/g,'&
 function copyTitle(e, title) {
   e.stopPropagation();
   navigator.clipboard.writeText(title)
-    .then(() => showToast('Disalin: ' + title))
+    .then(() => showToast('Copied: ' + title))
     .catch(() => {
       const ta = document.createElement('textarea');
       ta.value = title; document.body.appendChild(ta); ta.select();
       document.execCommand('copy'); document.body.removeChild(ta);
-      showToast('Disalin: ' + title);
+      showToast('Copied: ' + title);
     });
 }
 
@@ -837,19 +915,19 @@ function openDetail(id) {
 
   const grid = document.getElementById('dGrid');
   const rows = [
-    ['Sutradara', escHtml(m.director || '—')],
-    ['Tahun Rilis', m.year || '—'],
-    ['Durasi', m.runtime || '—'],
-    ['Link TMDB', m.tmdb ? `<a href="${escHtml(m.tmdb)}" target="_blank" rel="noopener">Buka &#8599;</a>` : '—'],
+    ['Director', escHtml(m.director || '—')],
+    ['Release Year', m.year || '—'],
+    ['Runtime', m.runtime || '—'],
+    ['TMDB Link', m.tmdb ? `<a href="${escHtml(m.tmdb)}" target="_blank" rel="noopener">Open &#8599;</a>` : '—'],
   ];
   grid.innerHTML = rows.map(([l, v]) => `<div class="detail-cell"><div class="detail-cell-label">${l}</div><div class="detail-cell-val">${v}</div></div>`).join('');
 
   const syn = document.getElementById('dSynopsis');
   const btn = document.getElementById('dReadMore');
-  syn.textContent = m.synopsis || 'Belum ada sinopsis.';
+  syn.textContent = m.synopsis || 'No synopsis available.';
   syn.classList.add('clamped');
   btn.style.display = (m.synopsis && m.synopsis.length > 200) ? 'block' : 'none';
-  btn.textContent = 'Baca selengkapnya ▼';
+  btn.textContent = 'Read more ▼';
 
   const overlay = document.getElementById('detailOverlay');
   overlay.style.display = 'flex';
@@ -870,7 +948,7 @@ function closeDetail() {
 function toggleSynopsis() {
   synopsisExpanded = !synopsisExpanded;
   document.getElementById('dSynopsis').classList.toggle('clamped', !synopsisExpanded);
-  document.getElementById('dReadMore').textContent = synopsisExpanded ? 'Sembunyikan ▲' : 'Baca selengkapnya ▼';
+  document.getElementById('dReadMore').textContent = synopsisExpanded ? 'Show less ▲' : 'Read more ▼';
 }
 
 document.getElementById('detailOverlay').addEventListener('click', function(e) {
@@ -902,7 +980,7 @@ document.addEventListener('keydown', e => {
   function finishLoading() {
     clearInterval(dotTimer);
     lsBar.style.width = '100%';
-    lsStatus.textContent = 'Siap!';
+    lsStatus.textContent = 'Ready!';
     setTimeout(() => {
       document.getElementById('loadingScreen').classList.add('hidden');
     }, 400);
@@ -934,7 +1012,7 @@ document.addEventListener('keydown', e => {
     loaded++;
     const pct = Math.round((loaded / total) * 100);
     lsBar.style.width = pct + '%';
-    lsStatus.textContent = 'Memuat poster ' + loaded + ' / ' + total;
+    lsStatus.textContent = 'Loading poster ' + loaded + ' / ' + total;
     if (loaded >= total) finishLoading();
   }
 
